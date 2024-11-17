@@ -84,15 +84,41 @@ public class GraphDatabase {
     public int deleteRelationships(Map<String, Object> criteria) {
         lock.writeLock().lock();
         try {
-            List<Relationship> toDelete = relationshipsByType.values().stream()
-                    .flatMap(typeMap -> typeMap.values().stream())
-                    .filter(rel -> matchesCriteria(rel.properties(), criteria))
-                    .collect(Collectors.toList());
+            List<Relationship> toDelete = new ArrayList<>();
 
-            toDelete.forEach(rel -> {
-                relationshipsByType.get(rel.type()).remove(rel.id());
-                persistenceManager.deleteRelationship((com.graphdb.core.model.Relationship) rel);
-            });
+            // Find all relationships that match the criteria
+            for (Map<Long, Relationship> typeMap : relationshipsByType.values()) {
+                for (Relationship rel : typeMap.values()) {
+                    boolean matches = true;
+                    for (Map.Entry<String, Object> entry : criteria.entrySet()) {
+                        Object relValue = rel.getProperties().get(entry.getKey());
+                        Object criteriaValue = entry.getValue();
+
+                        // Special handling for type field which is not in properties
+                        if (entry.getKey().equals("type")) {
+                            if (!rel.getType().equals(criteriaValue)) {
+                                matches = false;
+                                break;
+                            }
+                            continue;
+                        }
+
+                        if (relValue == null || !relValue.equals(criteriaValue)) {
+                            matches = false;
+                            break;
+                        }
+                    }
+                    if (matches) {
+                        toDelete.add(rel);
+                    }
+                }
+            }
+
+            // Delete the matched relationships
+            for (Relationship rel : toDelete) {
+                relationshipsByType.get(rel.getType()).remove(rel.getId());
+                persistenceManager.deleteRelationship(rel);
+            }
 
             return toDelete.size();
         } finally {
@@ -168,5 +194,10 @@ public class GraphDatabase {
         } finally {
             lock.readLock().unlock();
         }
+    }
+
+    public boolean relationshipExists(String type, long id) {
+        Map<Long, Relationship> relationships = relationshipsByType.get(type);
+        return relationships != null && relationships.containsKey(id);
     }
 }

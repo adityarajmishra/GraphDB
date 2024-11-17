@@ -24,9 +24,8 @@ public record Relationship(long id, String type, long sourceNodeId, long targetN
         this.directed = directed;
         this.properties = new HashMap<>(properties);
     }
-
-    @Override
-    public Map<String, Object> properties() {
+    
+    public Map<String, Object> getProperties() {
         return new HashMap<>(properties);
     }
 
@@ -41,5 +40,13 @@ public record Relationship(long id, String type, long sourceNodeId, long targetN
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public Long getId() {
+        return id;
     }
 }

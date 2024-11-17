@@ -8,6 +8,7 @@ import com.graphdb.core.CommandProcessor;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 public class App {
@@ -19,23 +20,20 @@ public class App {
         CommandProcessor processor = new CommandProcessor(graphDb);
 
         try (Scanner scanner = new Scanner(System.in)) {
-
             while (scanner.hasNextLine()) {
                 String command = scanner.nextLine().trim();
+                Future<String> future = executorService.submit(() -> processor.processCommand(command));
 
-                if (command.equalsIgnoreCase("STOP")) {
-                    System.out.println("ADIOS!");
-                    break;
-                }
+                try {
+                    String result = future.get(5, TimeUnit.SECONDS);
+                    System.out.println(result);
 
-                executorService.submit(() -> {
-                    try {
-                        String result = processor.processCommand(command);
-                        System.out.println(result);
-                    } catch (Exception e) {
-                        System.out.println("INVALID_COMMAND");
+                    if (command.equalsIgnoreCase("STOP")) {
+                        break;
                     }
-                });
+                } catch (Exception e) {
+                    System.out.println("INVALID_COMMAND");
+                }
             }
         } finally {
             shutdownExecutor(executorService);
