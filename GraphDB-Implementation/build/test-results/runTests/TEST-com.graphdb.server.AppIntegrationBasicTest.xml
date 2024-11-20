@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.graphdb.server.AppIntegrationBasicTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2024-11-17T17:19:06" hostname="RX297RV65C" time="0.123">
+  <properties/>
+  <testcase name="testExample1()" classname="com.graphdb.server.AppIntegrationBasicTest" time="0.097"/>
+  <testcase name="testExample2()" classname="com.graphdb.server.AppIntegrationBasicTest" time="0.004"/>
+  <testcase name="testExample3()" classname="com.graphdb.server.AppIntegrationBasicTest" time="0.008"/>
+  <testcase name="testExample4()" classname="com.graphdb.server.AppIntegrationBasicTest" time="0.011"/>
+  <testcase name="testExample5()" classname="com.graphdb.server.AppIntegrationBasicTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
